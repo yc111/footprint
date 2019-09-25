@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 let devConfig = require('./webpack.dev');
 let prodConfig = require('./webpack.prod');
@@ -11,7 +12,7 @@ module.exports = (env) => {
     let baseConfig = {
         entry: './src/index.js',
         output: {
-            filename: 'bundle.js',
+            filename: 'index.js',
             path: path.resolve(__dirname, '../dist')
         },
         module: {
@@ -54,6 +55,9 @@ module.exports = (env) => {
             !isDev && new MiniCssExtractPlugin({
                 filename: 'style.css'
             }),
+            new CopyWebpackPlugin([
+                {from: './src/assets', to: 'assets'}
+            ]),
             new HtmlWebpackPlugin({
                 template: './public/index.html',
                 filename: 'index.html',
