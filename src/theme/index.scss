@@ -1,0 +1,35 @@
+@import "./variables.scss";
+
+body {
+    // background-color: $bodybg;
+}
+
+#root {
+    width: 80%;
+    min-width: 800px;
+    min-height: 700px;
+    margin: 0 auto;
+    margin-top: 30px;
+} 
+
+ 
+.box {
+    transform: rotate(7deg);
+    text-align: center;
+    animation: box-rotate infinite 20s linear;
+
+    .iconfont {
+        font-size: 50px;
+        color: white;
+    }
+}
+
+@keyframes box-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+    
