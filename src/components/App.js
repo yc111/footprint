@@ -5,6 +5,10 @@ require('echarts/lib/component/tooltip');
 require('echarts/lib/component/title');
 require('echarts/lib/component/visualMap');
 require('echarts/lib/component/legend');
+require('echarts/lib/component/toolbox')
+
+import Util from './Util';
+const util = new Util();
 
 const NEVER = 0;
 const ONECE = 40;
@@ -57,6 +61,7 @@ let never = [];
 let onece = [];
 let afewtimes = [];
 let usually = [];
+let mapType = 'china';
 
 let handleData = function (rowData) {
     rowData.forEach(item => {
@@ -76,7 +81,7 @@ let handleData = function (rowData) {
     series = [usually, afewtimes, onece, never].map((item, index) => {
         let temp = {
             type: 'map',
-            map: 'china',
+            map: mapType,
             roam: true,
             itemStyle: {
                 emphasis: { label: { show: true } },
@@ -97,100 +102,91 @@ let handleData = function (rowData) {
 
 handleData(allprovinceData);
 
-export default function App () {
+let _color = ['#79b685', '#a7c69d', '#fee090', '#eee'];
+let _title = {
+    text: "PLACES I'V BEEN TO.",
+    subtext: "走遍中国",
+    sublink: "",
+    left: "left",
+    textStyle: {
+        fontWeight: 'bolder',
+        fontSize: 24
+    }
+};
+let _tooltip = {
+    trigger: 'item',
+    showDelay: 0,
+    transitionDuration: 0.2,
+    // formatter: function(params) {
+    //     // console.log(params); 
+    //     return params.name + '<br />' + params.seriesName
+    // }
+};
+let _legend = {
+    data: legendData,
+    align: 'left',
+    left: 0,
+    top: 60,
+    icon: 'pin'
+};
+let _visualMap = {
+    left: 'right',
+    min: 0,
+    max: 100,
+    inRange: {
+    //   color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+    //   color: ['#eee', '#ebedf0', '#fee090','#cce295', '#ade9ac', '#5fac80','#3eaf7c']//, '#305f3e'
+        color: ['#ebedf0', '#fee090', '#3eaf7c']//, '#305f3e'
+    }, 
+    text: ['High', 'Low'],
+    calculable: true
+};
+let _toolbox = {
+    show: true,
+    // orient: 'vertical',
+    left: 'left',
+    left: 300,
+    top: 'top',
+    itemGap: '30',
+    feature: {
+        // dataView: {readOnly: false},
+        // restore: {},
+        saveAsImage: {}
+    }
+};
+
+
+export default function App() {
     let myChart = echarts.init(document.getElementById('root'));
     myChart.showLoading();
-    let xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                let chinaJson = xhr.responseText;
-    
-                myChart.hideLoading();
-                echarts.registerMap('china', chinaJson, {})
-    
-                // 指定图表的配置项和数据
-                let option = {
-                    color: ['#79b685', '#a7c69d', '#fee090', '#eee'],
-                    title: {
-                        text: "PLACES I'V BEEN TO.",
-                        subtext: "走遍中国",
-                        sublink: "",
-                        left: "middle",
-                        textStyle: {
-                            fontWeight: 'bolder',
-                            fontSize: 24
-                        }
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        showDelay: 0,
-                        transitionDuration: 0.2,
-                        // formatter: function(params) {
-                        //     // console.log(params); 
-                        //     return params.name + '<br />' + params.seriesName
-                        // }
-                    },
-                    legend: {
-                        data: legendData,
-                        align: 'left',
-                        left: 10,
-                        icon: 'pin'
-                    },
-                    visualMap: {
-                        left: 'right',
-                        min: 0,
-                        max: 100,
-                        // inRange: {
-                        //     color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-                        // }, 
-                        // inRange: {
-                        //     color: ['#eee', '#ebedf0', '#fee090','#cce295', '#ade9ac', '#5fac80','#3eaf7c']//, '#305f3e'
-                        // }, 
-                        inRange: {
-                            color: ['#ebedf0', '#fee090', '#3eaf7c']//, '#305f3e'
-                        },
-                        text: ['High', 'Low'],
-                        calculable: true
-                    },
-                    toolBox: {
-                        show: true,
-                        left: 'left',
-                        top: 'top',
-                        feature: {
-                            dataView: { readOnly: false },
-                            restore: {},
-                            saveAsImage: {}
-                        }
-                    },
-                    series: series
-    
-                    // series: {
-                    //     name: '中国',
-                    //     type: 'map',
-                    //     map: 'china',
-                    //     roam: true,
-                    //     itemStyle: {
-                    //         emphasis: { label: { show: true } }
-                    //     },
-                    //     data: allprovinceData,
-                    // }
-                };
-    
-                // 使用刚指定的配置项和数据显示图表。
-                myChart.setOption(option);
-    
-                // myChart.setOption({
-                //     series: {
-                //         name: 'china',
-                //         type: 'map',
-                //         map: 'china'
-                //     }
-                // })
-            }
-        }
-    }
-    xhr.open('GET', 'assets/china.json', false);
-    xhr.send(null);
 
+    util.get('assets/china.json').then(data => {
+        //   console.log(data);
+        let chinaJson = data;
+
+        myChart.hideLoading();
+        echarts.registerMap(mapType, chinaJson, {})
+
+        // 指定图表的配置项和数据
+        let option = {
+            color: _color,
+            title: _title,
+            tooltip: _tooltip,
+            legend: _legend,
+            visualMap: _visualMap,
+            toolbox: _toolbox,
+            series: series,
+            // series: {
+            //     name: 'china',
+            //     type: 'map',
+            //     map: 'china'
+            // }
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+
+    }).catch(e => {
+        console.log('error:' + e);
+    })
 }
