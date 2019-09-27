@@ -16,7 +16,7 @@ const NEVER = 0;
 const ONECE = 40;
 const AFEWTIMES = 75;
 const USUALLY = 90;
-const SEQUENCE = [NEVER, ONECE, AFEWTIMES, USUALLY];
+const FREQUENCY = [NEVER, ONECE, AFEWTIMES, USUALLY];
 const LEBEL_COLOR = '#305f3e';
 const legendData = ['经常去', '去过几次', '去过一次', '没去过'];
 
@@ -29,7 +29,7 @@ let mapType = 'china';
 
 let handleData = function (rowData) {
     rowData.forEach(item => {
-        item.value = SEQUENCE[item.value]
+        item.value = FREQUENCY[item.value]
         if (item.value !== NEVER) {
             item.label = { show: true, color: LEBEL_COLOR }
         }
