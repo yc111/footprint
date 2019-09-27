@@ -114,7 +114,7 @@ export default function App () {
                     color: ['#79b685', '#a7c69d', '#fee090', '#eee'],
                     title: {
                         text: "PLACES I'V BEEN TO.",
-                        subtext: "",
+                        subtext: "走遍中国",
                         sublink: "",
                         left: "middle",
                         textStyle: {
