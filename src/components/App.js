@@ -1,60 +1,24 @@
-// 引入 ECharts 主模块
-const echarts = require('echarts/lib/echarts');
-require('echarts/lib/chart/map');
-require('echarts/lib/component/tooltip');
-require('echarts/lib/component/title');
-require('echarts/lib/component/visualMap');
-require('echarts/lib/component/legend');
-require('echarts/lib/component/toolbox')
-
+// 按需引入 ECharts 模块
+import echarts from 'echarts/lib/echarts';
+import 'echarts/lib/chart/map';
+import 'echarts/lib/component/tooltip';
+import 'echarts/lib/component/title';
+import 'echarts/lib/component/visualMap';
+import 'echarts/lib/component/legend';
+import 'echarts/lib/component/toolbox';
 import Util from './Util';
-const util = new Util();
 
+// 获取用户数据
+import placeData from '../config/place.config';
+
+const util = new Util();
 const NEVER = 0;
 const ONECE = 40;
 const AFEWTIMES = 75;
 const USUALLY = 90;
+const SEQUENCE = [NEVER, ONECE, AFEWTIMES, USUALLY];
 const LEBEL_COLOR = '#305f3e';
-
 const legendData = ['经常去', '去过几次', '去过一次', '没去过'];
-
-let allprovinceData = [
-    { name: "黑龙江", value: NEVER },
-    { name: "吉林", value: NEVER },
-    { name: "辽宁", value: NEVER },
-    { name: "上海", value: AFEWTIMES },
-    { name: "江苏", value: USUALLY },
-    { name: "浙江", value: USUALLY },
-    { name: "安徽", value: AFEWTIMES },
-    { name: "福建", value: NEVER },
-    { name: "江西", value: AFEWTIMES },
-    { name: "山东", value: AFEWTIMES },
-    { name: "台湾", value: ONECE },
-    { name: "北京", value: AFEWTIMES },
-    { name: "天津", value: ONECE },
-    { name: "山西", value: NEVER },
-    { name: "河北", value: NEVER },
-    { name: "内蒙古", value: NEVER },
-    { name: "河南", value: USUALLY },
-    { name: "湖北", value: AFEWTIMES },
-    { name: "湖南", value: USUALLY },
-    { name: "广东", value: USUALLY },
-    { name: "广西", value: NEVER },
-    { name: "海南", value: ONECE },
-    { name: "香港", value: AFEWTIMES },
-    { name: "澳门", value: ONECE },
-    { name: "重庆", value: ONECE },
-    { name: "四川", value: AFEWTIMES },
-    { name: "贵州", value: NEVER },
-    { name: "云南", value: ONECE },
-    { name: "西藏", value: NEVER },
-    { name: "陕西", value: ONECE },
-    { name: "甘肃", value: AFEWTIMES },
-    { name: "青海", value: AFEWTIMES },
-    { name: "宁夏", value: NEVER },
-    { name: "新疆", value: NEVER },
-    { name: "南海诸岛", value: NEVER }
-];
 
 let series = [];
 let never = [];
@@ -65,6 +29,7 @@ let mapType = 'china';
 
 let handleData = function (rowData) {
     rowData.forEach(item => {
+        item.value = SEQUENCE[item.value]
         if (item.value !== NEVER) {
             item.label = { show: true, color: LEBEL_COLOR }
         }
@@ -100,7 +65,8 @@ let handleData = function (rowData) {
     // console.log(series);
 }
 
-handleData(allprovinceData);
+// 处理用户数据
+handleData(placeData);
 
 let _color = ['#79b685', '#a7c69d', '#fee090', '#eee'];
 let _title = {
@@ -155,13 +121,12 @@ let _toolbox = {
     }
 };
 
-
 export default function App() {
     let myChart = echarts.init(document.getElementById('root'));
     myChart.showLoading();
 
     util.get('assets/china.json').then(data => {
-        //   console.log(data);
+        //  console.log(data);
         let chinaJson = data;
 
         myChart.hideLoading();
