@@ -9,7 +9,7 @@ import 'echarts/lib/component/toolbox';
 import Util from './Util';
 
 // 获取用户数据
-import placeData from '../config/place.config';
+import userData from '../config/place.config';
 
 const util = new Util();
 const NEVER = 0;
@@ -25,7 +25,7 @@ let never = [];
 let onece = [];
 let afewtimes = [];
 let usually = [];
-let mapType = 'china';
+let mapName = 'china';
 
 let handleData = function (rowData) {
     rowData.forEach(item => {
@@ -46,7 +46,7 @@ let handleData = function (rowData) {
     series = [usually, afewtimes, onece, never].map((item, index) => {
         let temp = {
             type: 'map',
-            map: mapType,
+            map: mapName,
             roam: true,
             itemStyle: {
                 emphasis: { label: { show: true } },
@@ -66,7 +66,7 @@ let handleData = function (rowData) {
 }
 
 // 处理用户数据
-handleData(placeData);
+handleData(userData);
 
 let _color = ['#79b685', '#a7c69d', '#fee090', '#eee'];
 let _title = {
@@ -130,7 +130,7 @@ export default function App() {
         let chinaJson = data;
 
         myChart.hideLoading();
-        echarts.registerMap(mapType, chinaJson, {})
+        echarts.registerMap(mapName, chinaJson, {})
 
         // 指定图表的配置项和数据
         let option = {
