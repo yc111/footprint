@@ -20,7 +20,6 @@ const FREQUENCY = [NEVER, ONECE, AFEWTIMES, USUALLY];
 const LEBEL_COLOR = '#305f3e';
 const legendData = ['经常去', '去过几次', '去过一次', '没去过'];
 
-let series = [];
 let never = [];
 let onece = [];
 let afewtimes = [];
@@ -43,7 +42,7 @@ let handleData = function (rowData) {
             usually.push(item);
         }
     });
-    series = [usually, afewtimes, onece, never].map((item, index) => {
+    let _series = [usually, afewtimes, onece, never].map((item, index) => {
         let temp = {
             type: 'map',
             map: mapName,
@@ -63,10 +62,24 @@ let handleData = function (rowData) {
         return temp;
     })
     // console.log(series);
+    return _series;
 }
 
 // 处理用户数据
-handleData(userData);
+let series = handleData(userData);
+
+let getSeriesName = function(provinceName) {
+    let p = userData.find(item => item.name === provinceName);
+    if(p.value === NEVER) {
+        return legendData[3];
+    }else if(p.value === ONECE) {
+        return legendData[2];
+    }if(p.value === AFEWTIMES) {
+        return legendData[1];
+    }if(p.value === USUALLY) {
+        return legendData[0];
+    }
+}
 
 let _color = ['#79b685', '#a7c69d', '#fee090', '#eee'];
 let _title = {
@@ -83,10 +96,10 @@ let _tooltip = {
     trigger: 'item',
     showDelay: 0,
     transitionDuration: 0.2,
-    // formatter: function(params) {
-    //     // console.log(params); 
-    //     return params.name + '<br />' + params.seriesName
-    // }
+    formatter: function(params) {
+        let seriesName = getSeriesName(params.name)
+        return params.name + '<br />' + seriesName
+    }
 };
 let _legend = {
     data: legendData,
