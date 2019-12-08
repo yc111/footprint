@@ -7,28 +7,29 @@ import 'echarts/lib/component/visualMap';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/toolbox';
 import Util from './Util';
-
-// 获取用户数据
+import chinaProviceData from '../config/china.province';
+import areaNamePinyins from '../config/china.cityies';
 import userData from '../config/place.config';
 
 const util = new Util();
+let mapName = 'china';
+let names = [];
+const legendData = ['经常去', '去过几次', '去过一次', '没去过'];
+
 const NEVER = 0;
 const ONECE = 40;
 const AFEWTIMES = 75;
 const USUALLY = 90;
 const FREQUENCY = [NEVER, ONECE, AFEWTIMES, USUALLY];
 const LEBEL_COLOR = '#305f3e';
-const legendData = ['经常去', '去过几次', '去过一次', '没去过'];
-
 let never = [];
 let onece = [];
 let afewtimes = [];
 let usually = [];
-let mapName = 'china';
 
 let handleData = function (rowData) {
     rowData.forEach(item => {
-        item.value = FREQUENCY[item.value]
+        item.value = FREQUENCY[item.degree]
         if (item.value !== NEVER) {
             item.label = { show: true, color: LEBEL_COLOR }
         }
@@ -42,20 +43,20 @@ let handleData = function (rowData) {
             usually.push(item);
         }
     });
+
     let _series = [usually, afewtimes, onece, never].map((item, index) => {
         let temp = {
             type: 'map',
             map: mapName,
             roam: true,
+            scaleLimit: {
+                max: 4,
+                min: 1
+            },
             itemStyle: {
                 emphasis: { label: { show: true } },
                 areaColor: '#fff'
-            },
-            // markPoint: {
-            //     symbol: 'pin',
-            //     symbolSize: 10,
-            //     data: []
-            // }
+            }
         };
         temp.name = legendData[index];
         temp.data = item;
@@ -81,6 +82,35 @@ let getSeriesName = function(provinceName) {
     }
 }
 
+let getPName = (pName) => {
+    try{
+        let {name, map : pMap} = chinaProviceData.find(item => {
+            return item.name === pName
+        })
+        return pMap;
+    }catch{
+        console.log(`"${pName}" 不是省`);
+        return undefined;
+    }
+}
+
+/**
+ * 获取各map请求路径
+ * @param {String} kName : 国家
+ * @param {String} pName : 省
+ * @param {String} cName : 市
+ */
+let getMapPath = function(kName, pName, cName) {
+    try{
+        if(cName) {
+            return `assets/${kName}/${pName}/${cName}.json`;
+        }
+        return `assets/${kName}/${pName}.json`;
+    }catch{
+        throw new Error(`没有相应数据："${kName}/${pName}/${cName}"`);
+    }
+}
+
 let _color = ['#79b685', '#a7c69d', '#fee090', '#eee'];
 let _title = {
     text: "PLACES I'V BEEN TO.",
@@ -96,7 +126,7 @@ let _tooltip = {
     trigger: 'item',
     showDelay: 0,
     transitionDuration: 0.2,
-    formatter: function(params) {
+    formatter: (params) => {
         let seriesName = getSeriesName(params.name)
         return params.name + '<br />' + seriesName
     }
@@ -113,8 +143,6 @@ let _visualMap = {
     min: 0,
     max: 100,
     inRange: {
-    //   color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
-    //   color: ['#eee', '#ebedf0', '#fee090','#cce295', '#ade9ac', '#5fac80','#3eaf7c']//, '#305f3e'
         color: ['#ebedf0', '#fee090', '#3eaf7c']//, '#305f3e'
     }, 
     text: ['High', 'Low'],
@@ -122,24 +150,25 @@ let _visualMap = {
 };
 let _toolbox = {
     show: true,
-    // orient: 'vertical',
     left: 'left',
     left: 300,
     top: 'top',
     itemGap: '30',
     feature: {
-        // dataView: {readOnly: false},
-        // restore: {},
         saveAsImage: {}
     }
 };
+
+let level = '';
 
 export default function App() {
     let myChart = echarts.init(document.getElementById('root'));
     myChart.showLoading();
 
-    util.get('assets/china.json').then(data => {
+    util.get(`assets/china.json`).then(data => {
         //  console.log(data);
+        names.push(mapName);
+
         let chinaJson = data;
 
         myChart.hideLoading();
@@ -158,7 +187,7 @@ export default function App() {
             //     name: 'china',
             //     type: 'map',
             //     map: 'china'
-            // }
+            // },
         };
 
         // 使用刚指定的配置项和数据显示图表。
@@ -166,5 +195,45 @@ export default function App() {
 
     }).catch(e => {
         console.log('error:' + e);
+    })
+
+    myChart.on('click', function () {
+        // console.log(arguments)
+        const areaName = arguments[0].name;
+        // console.log(areaName);
+
+        const pNamePinyin = getPName(areaName);
+        if (pNamePinyin) {
+            names.push(pNamePinyin);
+        } else {
+            const cNamePinyin = areaNamePinyins[areaName];
+            if(cNamePinyin) {
+                names.push(cNamePinyin);
+            }
+        }
+
+        const path = getMapPath(...names);
+        // console.log(names);
+        console.log(path)
+
+        util.get(path).then(data => {
+            myChart.hideLoading();
+
+            let chinaJson = data;
+            echarts.registerMap(areaName, chinaJson, {})
+
+            // 指定图表的配置项和数据
+            let option = {
+                series: {
+                    name: areaName,
+                    type: 'map',
+                    map: areaName
+                }
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.clear();
+            myChart.setOption(option);
+        })
     })
 }
