@@ -103,8 +103,10 @@ let _tooltip = {
     showDelay: 0,
     transitionDuration: 0.2,
     formatter: (params) => {
-        let seriesName = params.data.tag;
-        return params.name + '<br />' + seriesName
+        if(params.data) {
+            let seriesName = params.data.tag;
+            return params.name + '<br />' + seriesName
+        }
     }
 };
 let _legend = {
