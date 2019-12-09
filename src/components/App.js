@@ -1,6 +1,7 @@
 // 按需引入 ECharts 模块
 import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/chart/map';
+import 'echarts/lib/chart/pie';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title';
 import 'echarts/lib/component/visualMap';
@@ -22,65 +23,35 @@ const AFEWTIMES = 75;
 const USUALLY = 90;
 const FREQUENCY = [NEVER, ONECE, AFEWTIMES, USUALLY];
 const LEBEL_COLOR = '#305f3e';
-let never = [];
-let onece = [];
-let afewtimes = [];
-let usually = [];
+let nCount = 0;
+let oCount = 0;
+let aCount = 0;
+let uCount = 0;
 
+// 处理用户数据
 let handleData = function (rowData) {
     rowData.forEach(item => {
         item.value = FREQUENCY[item.degree]
         if (item.value !== NEVER) {
             item.label = { show: true, color: LEBEL_COLOR }
         }
-        if (item.value === NEVER) {
-            never.push(item);
-        } else if (item.value === ONECE) {
-            onece.push(item);
-        } else if (item.value === AFEWTIMES) {
-            afewtimes.push(item);
-        } else {
-            usually.push(item);
+        if(item.value === NEVER) {
+            item.tag = legendData[3];
+            nCount ++;
+        }else if(item.value === ONECE) {
+            item.tag = legendData[2];
+            oCount ++;
+        }else if(item.value === AFEWTIMES) {
+            item.tag = legendData[1];
+            aCount ++;
+        }else {
+            item.tag = legendData[0];
+            uCount ++;
         }
     });
-
-    let _series = [usually, afewtimes, onece, never].map((item, index) => {
-        let temp = {
-            type: 'map',
-            map: mapName,
-            roam: true,
-            scaleLimit: {
-                max: 4,
-                min: 1
-            },
-            itemStyle: {
-                emphasis: { label: { show: true } },
-                areaColor: '#fff'
-            }
-        };
-        temp.name = legendData[index];
-        temp.data = item;
-        return temp;
-    })
-    // console.log(series);
-    return _series;
 }
 
-// 处理用户数据
-let series = handleData(userData);
-
-let getSeriesName = function(provinceName) {
-    let p = userData.find(item => item.name === provinceName);
-    if(p.value === NEVER) {
-        return legendData[3];
-    }else if(p.value === ONECE) {
-        return legendData[2];
-    }if(p.value === AFEWTIMES) {
-        return legendData[1];
-    }if(p.value === USUALLY) {
-        return legendData[0];
-    }
-}
+handleData(userData);
 
 let getPName = (pName) => {
     try{
@@ -89,7 +60,7 @@ let getPName = (pName) => {
         })
         return pMap;
     }catch{
-        console.log(`"${pName}" 不是省`);
+        console.log(`"${pName}"`); //不是省
         return undefined;
     }
 }
@@ -111,7 +82,7 @@ let getMapPath = function(kName, pName, cName) {
     }
 }
 
-let _color = ['#79b685', '#a7c69d', '#fee090', '#eee'];
+let _color = ['#79b685', '#a7c69d', '#fee090', '#eee']; //'#305f3e', 
 let _title = {
     text: "PLACES I'V BEEN TO.",
     subtext: "走遍中国",
@@ -127,7 +98,7 @@ let _tooltip = {
     showDelay: 0,
     transitionDuration: 0.2,
     formatter: (params) => {
-        let seriesName = getSeriesName(params.name)
+        let seriesName = params.data.tag;
         return params.name + '<br />' + seriesName
     }
 };
@@ -142,8 +113,9 @@ let _visualMap = {
     left: 'right',
     min: 0,
     max: 100,
+    seriesIndex:'1',
     inRange: {
-        color: ['#ebedf0', '#fee090', '#3eaf7c']//, '#305f3e'
+        color: ['#ebedf0', '#fee090', '#3eaf7c']
     }, 
     text: ['High', 'Low'],
     calculable: true
@@ -159,38 +131,94 @@ let _toolbox = {
     }
 };
 
-let level = '';
+// 初始化配置
+let option = {
+    color: _color,
+    title: _title,
+    legend: _legend,
+    tooltip: {},
+    visualMap: _visualMap,
+    toolbox: _toolbox,
+    series: [
+        {
+            type: 'pie',
+            zLevel: 1,
+            center: [80, 200],
+            radius: ['10%', '15%'],
+            tooltip: {
+                formatter: (params) => {
+                    return params.percent + '%'
+                }
+            },
+            label: {
+                normal: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    show: true,
+                }
+            },
+            labelLine: {
+                show: false
+            },
+            data: [
+                {name: '经常去', value: uCount},
+                {name: '去过几次', value: aCount},
+                {name: '去过一次', value: oCount},
+                {name: '没去过', value: nCount}
+            ]
+        }, 
+        {
+            type: 'map',
+            name: mapName,
+            map: mapName,
+            color: ['transparent'],
+            tooltip: _tooltip,
+            roam: true,
+            scaleLimit: {
+                max: 4,
+                min: 1
+            },
+            itemStyle: {
+                emphasis: { label: { show: true } },
+                areaColor: '#fff'
+            },
+            data: userData
+        }
+    ],
+    // series: {
+    //     name: 'china',
+    //     type: 'map',
+    //     map: 'china'
+    // },
+};
+
+const filterMap = (param) => {
+   let temp = param.selected;
+   let selects = [];
+    for(let key in temp) {
+        if(temp[key]) {
+            selects.push(key)
+        }
+    }
+    return userData.filter((item) => {
+        return selects.includes(item.tag); 
+    })
+}
 
 export default function App() {
     let myChart = echarts.init(document.getElementById('root'));
     myChart.showLoading();
 
     util.get(`assets/china.json`).then(data => {
-        //  console.log(data);
-        names.push(mapName);
-
         let chinaJson = data;
-
+        names.push(mapName);
         myChart.hideLoading();
         echarts.registerMap(mapName, chinaJson, {})
 
-        // 指定图表的配置项和数据
-        let option = {
-            color: _color,
-            title: _title,
-            tooltip: _tooltip,
-            legend: _legend,
-            visualMap: _visualMap,
-            toolbox: _toolbox,
-            series: series,
-            // series: {
-            //     name: 'china',
-            //     type: 'map',
-            //     map: 'china'
-            // },
-        };
+        // option.series[1][data] = userData;
 
-        // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
 
     }).catch(e => {
@@ -214,7 +242,7 @@ export default function App() {
 
         const path = getMapPath(...names);
         // console.log(names);
-        console.log(path)
+        // console.log(path)
 
         util.get(path).then(data => {
             myChart.hideLoading();
@@ -231,9 +259,14 @@ export default function App() {
                 }
             };
 
-            // 使用刚指定的配置项和数据显示图表。
+            // 刷新图表
             myChart.clear();
             myChart.setOption(option);
         })
+    })
+
+    myChart.on('legendselectchanged', function(params) {
+        option.series[1].data = filterMap(params);
+        myChart.setOption(option);
     })
 }
