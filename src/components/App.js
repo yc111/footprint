@@ -8,12 +8,13 @@ import 'echarts/lib/component/visualMap';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/toolbox';
 import Util from './Util';
+import kingdomData from '../config/kingdoms';
 import chinaProviceData from '../config/china.province';
 import areaNamePinyins from '../config/china.cityies';
 import userData from '../config/place.config';
 
 const util = new Util();
-let mapName = 'china';
+let mapName = 'world';
 let names = [];
 const legendData = ['经常去', '去过几次', '去过一次', '没去过'];
 
@@ -53,14 +54,15 @@ let handleData = function (rowData) {
 
 handleData(userData);
 
-let getPName = (pName) => {
+// 获取地图名称
+let getMapName = (areaName, source) => {
     try{
-        let {name, map : pMap} = chinaProviceData.find(item => {
-            return item.name === pName
+        let {name, map: mapName} = source.find(item => {
+            return item.name === areaName
         })
-        return pMap;
+        return mapName;
     }catch{
-        console.log(`"${pName}"`); //不是省
+        console.log(`Could'nt find "${areaName}".`); 
         return undefined;
     }
 }
@@ -71,12 +73,15 @@ let getPName = (pName) => {
  * @param {String} pName : 省
  * @param {String} cName : 市
  */
-let getMapPath = function(kName, pName, cName) {
+let getMapPath = function(world, kName, pName, cName) {
     try{
         if(cName) {
-            return `assets/${kName}/${pName}/${cName}.json`;
+            return `assets/${world}/${kName}/${pName}/${cName}.json`;
         }
-        return `assets/${kName}/${pName}.json`;
+        if(pName) {
+            return `assets/${world}/${kName}/${pName}.json`;
+        }
+        return `assets/${world}/${kName}.json`;
     }catch{
         throw new Error(`没有相应数据："${kName}/${pName}/${cName}"`);
     }
@@ -85,7 +90,7 @@ let getMapPath = function(kName, pName, cName) {
 let _color = ['#79b685', '#a7c69d', '#fee090', '#eee']; //'#305f3e', 
 let _title = {
     text: "PLACES I'V BEEN TO.",
-    subtext: "走遍中国",
+    subtext: "环游世界",
     sublink: "",
     left: "left",
     textStyle: {
@@ -130,9 +135,7 @@ let _toolbox = {
         saveAsImage: {}
     }
 };
-
-// 初始化配置
-let option = {
+let options = {
     color: _color,
     title: _title,
     legend: _legend,
@@ -143,7 +146,7 @@ let option = {
         {
             type: 'pie',
             zLevel: 1,
-            center: [80, 200],
+            center: [60, 200],
             radius: ['10%', '15%'],
             tooltip: {
                 formatter: (params) => {
@@ -174,7 +177,7 @@ let option = {
             name: mapName,
             map: mapName,
             color: ['transparent'],
-            tooltip: _tooltip,
+            // tooltip: _tooltip,
             roam: true,
             scaleLimit: {
                 max: 4,
@@ -194,6 +197,10 @@ let option = {
     // },
 };
 
+const initOptions = () => {
+    return options;
+}
+
 const filterMap = (param) => {
    let temp = param.selected;
    let selects = [];
@@ -211,15 +218,15 @@ export default function App() {
     let myChart = echarts.init(document.getElementById('root'));
     myChart.showLoading();
 
-    util.get(`assets/china.json`).then(data => {
-        let chinaJson = data;
+    util.get(`assets/${mapName}.json`).then(data => {
+        let mapJson = data;
         names.push(mapName);
         myChart.hideLoading();
-        echarts.registerMap(mapName, chinaJson, {})
+        echarts.registerMap(mapName, mapJson, {})
 
         // option.series[1][data] = userData;
-
-        myChart.setOption(option);
+        let o = initOptions();
+        myChart.setOption(o);
 
     }).catch(e => {
         console.log('error:' + e);
@@ -230,15 +237,27 @@ export default function App() {
         const areaName = arguments[0].name;
         // console.log(areaName);
 
-        const pNamePinyin = getPName(areaName);
-        if (pNamePinyin) {
-            names.push(pNamePinyin);
-        } else {
-            const cNamePinyin = areaNamePinyins[areaName];
-            if(cNamePinyin) {
-                names.push(cNamePinyin);
+        const kName = getMapName(areaName, kingdomData);
+        const pNamePinyin = getMapName(areaName, chinaProviceData);
+        const cNamePinyin = areaNamePinyins[areaName];
+
+        if (kName) {
+            if(!names.includes(kName)) {
+                names.push(kName);
             }
-        }
+        } else if (pNamePinyin) {
+            if(!names.includes(pNamePinyin)) {
+                names.push(pNamePinyin);
+            }
+        } else {
+            if (cNamePinyin) {
+                if(!names.includes(pNamePinyin)) {
+                    names.push(cNamePinyin);
+                }
+            } else {
+                return;
+            }
+        } 
 
         const path = getMapPath(...names);
         // console.log(names);
@@ -247,26 +266,22 @@ export default function App() {
         util.get(path).then(data => {
             myChart.hideLoading();
 
-            let chinaJson = data;
-            echarts.registerMap(areaName, chinaJson, {})
-
-            // 指定图表的配置项和数据
-            let option = {
-                series: {
-                    name: areaName,
-                    type: 'map',
-                    map: areaName
-                }
-            };
+            let mapJson = data;
+            echarts.registerMap(areaName, mapJson, {})
 
             // 刷新图表
             myChart.clear();
-            myChart.setOption(option);
+            let o = initOptions();
+            o.title.subtext = areaName;
+            o.series[1].name = areaName;
+            o.series[1].map = areaName;
+            myChart.setOption(o);
         })
     })
 
     myChart.on('legendselectchanged', function(params) {
-        option.series[1].data = filterMap(params);
-        myChart.setOption(option);
+        let o = initOptions();
+        o.series[1].data = filterMap(params);
+        myChart.setOption(o);
     })
 }

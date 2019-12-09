@@ -1,4 +1,8 @@
 let data = [ // 0: 没去过 1: 去过1次 2: 去过几次 3: 经常去
+    { name: "China", degree: 3 },
+    { name: "United States of America", degree: "0" },
+    { name: "Thailand", degree: "1" },
+    { name: "Malaysia", degree: "1" },
     { name: "安徽", degree: 2 },
     { name: "澳门", degree: 1 },
     { name: "北京", degree: 2 },
