@@ -177,7 +177,7 @@ let options = {
             name: mapName,
             map: mapName,
             color: ['transparent'],
-            // tooltip: _tooltip,
+            tooltip: _tooltip,
             roam: true,
             scaleLimit: {
                 max: 4,
