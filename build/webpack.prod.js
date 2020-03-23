@@ -5,19 +5,19 @@ const TersorWebpackPlugin = require('terser-webpack-plugin');
 
 console.log(path.join(process.cwd()));
 module.exports = {
-    mode: 'production',
-    plugins: [
-        new CleanWebpackPlugin({}),
-        function () {
-            this.plugin('done', function (stats) {
-                console.log('stats');
-            });
-        }
+  mode: 'production',
+  plugins: [
+    new CleanWebpackPlugin({}),
+    function () {
+      this.plugin('done', (stats) => {
+        console.log('stats', stats);
+      });
+    },
+  ],
+  optimization: {
+    minimizer: [
+      new OptimizeCssAssetsWebpackPlugin(),
+      new TersorWebpackPlugin(),
     ],
-    optimization: {
-        minimizer: [
-            new OptimizeCssAssetsWebpackPlugin(),
-            new TersorWebpackPlugin()
-        ]
-    }
-}
+  },
+};
