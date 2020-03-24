@@ -66,8 +66,13 @@ export default {
       } else {
         const mapSource = getMapSourceName(args[0].name);
 
-        // 没有地图资源，啥也不做
+        // 没有地图资源，提示一下地名
         if (!mapSource) {
+          this.$toast({
+            type: 'warning',
+            msg: args[0].name,
+            position: 'bottom-left',
+          });
           return;
         }
 

@@ -16,7 +16,7 @@ function getMapSourceName(areaName) {
   if (city) {
     return { level: 3, sourceName: city.map };
   }
-  console.log(`Could'nt find map of "${areaName}".`);
+  // console.log(`Could'nt find map of "${areaName}".`);
   return null;
 }
 
