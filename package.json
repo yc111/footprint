@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run dev",
-    "dev": "webpack-dev-server --env.development --config ./build/webpack.base.js",
+    "dev": "webpack-dev-server --env.development --config ./build/webpack.base.js --open --hot",
     "dev:build": "webpack --env.development --config ./build/webpack.base.js",
     "build": "webpack --env.production --config ./build/webpack.base.js"
   },
