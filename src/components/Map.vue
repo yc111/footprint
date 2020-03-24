@@ -44,7 +44,6 @@ export default {
       });
     },
     updateChart(args) {
-      this.mapName = args[0].name;
       const mapSource = getMapSourceName(args[0].name);
 
       if (!mapSource) {
@@ -54,6 +53,7 @@ export default {
         return;
       }
 
+      this.mapName = mapSource.sourceName;
       this.names[mapSource.level] = mapSource.sourceName;
       const path = `assets/${this.names.join('/')}.json`;
 
