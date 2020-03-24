@@ -10,7 +10,7 @@ import 'echarts/lib/component/toolbox';
 import Util from './Util';
 import kingdomData from '../config/kingdoms';
 import chinaProviceData from '../config/china.province';
-import areaNamePinyins from '../config/china.cityies';
+import chinaCityData from '../config/china.cityies';
 import userData from '../config/place.config';
 
 const util = new Util();
@@ -231,20 +231,20 @@ export default function App() {
     // console.log(areaName);
 
     const kName = getMapName(areaName, kingdomData);
-    const pNamePinyin = getMapName(areaName, chinaProviceData);
-    const cNamePinyin = areaNamePinyins[areaName];
+    const pName = getMapName(areaName, chinaProviceData);
+    const cName = getMapName(areaName, chinaCityData);
 
     if (kName) {
       if (!names.includes(kName)) {
         names.push(kName);
       }
-    } else if (pNamePinyin) {
-      if (!names.includes(pNamePinyin)) {
-        names.push(pNamePinyin);
+    } else if (pName) {
+      if (!names.includes(pName)) {
+        names.push(pName);
       }
-    } else if (cNamePinyin) {
-      if (!names.includes(pNamePinyin)) {
-        names.push(cNamePinyin);
+    } else if (cName) {
+      if (!names.includes(pName)) {
+        names.push(cName);
       }
     } else {
       return;

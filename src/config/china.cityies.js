@@ -1,20 +1,20 @@
-const data = {
-  长沙市: 'changsha',
-  常德市: 'changde',
-  郴州市: 'chenzhou',
-  衡阳市: 'hengyang',
-  怀化市: 'huaihua',
-  娄底市: 'loudi',
-  邵阳市: 'shaoyang',
-  湘潭市: 'xiangtan',
-  湘西土家族苗族自治州: 'xiangxi',
-  益阳市: 'yiyang',
-  永州市: 'yongzhou',
-  岳阳市: 'yueyang',
-  张家界市: 'zhangjiajie',
-  株洲市: 'zhuzhou',
-  定西市: 'dingxi',
-  天水市: 'tianshui',
-};
+const data = [
+  { name: '长沙市', map: 'changsha' },
+  { name: '常德市', map: 'changde' },
+  { name: '郴州市', map: 'chenzhou' },
+  { name: '衡阳市', map: 'hengyang' },
+  { name: '怀化市', map: 'huaihua' },
+  { name: '娄底市', map: 'loudi' },
+  { name: '邵阳市', map: 'shaoyang' },
+  { name: '湘潭市', map: 'xiangtan' },
+  { name: '湘西土家族苗族自治州', map: 'xiangxi' },
+  { name: '益阳市', map: 'yiyang' },
+  { name: '永州市', map: 'yongzhou' },
+  { name: '岳阳市', map: 'yueyang' },
+  { name: '张家界市', map: 'zhangjiajie' },
+  { name: '株洲市', map: 'zhuzhou' },
+  { name: '定西市', map: 'dingxi' },
+  { name: '天水市', map: 'tianshui' },
+];
 
 export default data;
