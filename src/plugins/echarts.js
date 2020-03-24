@@ -8,5 +8,6 @@ import 'echarts/lib/component/title';
 import 'echarts/lib/component/visualMap';
 import 'echarts/lib/component/legend';
 import 'echarts/lib/component/toolbox';
+import 'echarts/lib/component/graphic';
 
 Vue.prototype.$echarts = echarts;

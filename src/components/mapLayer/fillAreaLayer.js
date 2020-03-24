@@ -2,12 +2,15 @@ import * as echarts from 'echarts/lib/echarts';
 import worldGeo from '../../assets/world.json';
 
 class FillAreaLayer {
-  constructor(chart, mapName, geoData, pieData, mapData) {
+  constructor(chart, areaName, names, geoData, pieData, mapData) {
     this.chart = chart;
-    this.mapName = mapName;
+    this.areaName = areaName;
+    this.names = names;
+    this.mapName = this.getMapName();
     this.geoData = geoData;
     this.pieData = pieData;
     this.mapData = mapData;
+
     const color = ['#79b685', '#a7c69d', '#fee090', '#eee']; // '#305f3e',
 
     const title = {
@@ -20,6 +23,25 @@ class FillAreaLayer {
         fontSize: 24,
       },
     };
+
+    const graphic = [
+      {
+        id: 'world',
+        name: this.areaName,
+        type: 'text',
+        z: 100,
+        left: 65,
+        top: '40px',
+        style: {
+          fill: '#aaa',
+          text: this.areaName,
+          font: '12px Microsoft YaHei',
+        },
+        // onclick: function () { // eslint-disable-line object-shorthand
+        //   console.log('click graphic: ', this.style);
+        // },
+      },
+    ];
 
     const tooltip = {
       trigger: 'item',
@@ -94,8 +116,8 @@ class FillAreaLayer {
 
     const mapSeries = {
       type: 'map',
-      name: mapName,
-      map: mapName,
+      name: this.mapName,
+      map: this.mapName,
       color: ['transparent'],
       tooltip,
       roam: true,
@@ -113,6 +135,7 @@ class FillAreaLayer {
     this.option = {
       color,
       title,
+      graphic,
       legend,
       tooltip: {},
       visualMap,
@@ -135,6 +158,10 @@ class FillAreaLayer {
     });
   }
 
+  getMapName() {
+    return this.names[this.names.length - 1];
+  }
+
   filterMap(userData, param) {
     const temp = param.selected;
     const selects = [];
@@ -147,7 +174,6 @@ class FillAreaLayer {
   }
 
   render(chart, option) {
-    console.log('render');
     chart.setOption(option);
   }
 
@@ -161,12 +187,35 @@ class FillAreaLayer {
     chart.setOption(this.option);
   }
 
-  updateMap(chart, areaName, geoData) {
-    echarts.registerMap(areaName, geoData);
+  updateMap(chart, areaName, names, geoData) {
+    this.names = names;
+    this.areaName = areaName;
+    this.mapName = this.getMapName();
+
+    echarts.registerMap(this.mapName, geoData);
     chart.clear();
-    this.option.title.subtext = areaName;
-    this.option.series[1].name = areaName;
-    this.option.series[1].map = areaName;
+    if (this.names.length > this.option.graphic.length) {
+      this.option.graphic.push(
+        {
+          id: this.mapName,
+          name: this.areaName,
+          type: 'text',
+          z: 100,
+          left: this.option.graphic[this.option.graphic.length - 1].left + 40,
+          top: '40px',
+          style: {
+            fill: '#aaa',
+            text: areaName,
+            font: '12px Microsoft YaHei',
+          },
+        },
+      );
+    } else {
+      this.option.graphic = this.option.graphic.slice(0, this.names.length);
+    }
+
+    this.option.series[1].name = this.mapName;
+    this.option.series[1].map = this.mapName;
     chart.setOption(this.option);
   }
 }
