@@ -5,11 +5,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import FillAreaLayer from './mapLayer/fillAreaLayer';
 import rawData from '../config/place.config';
 import handleData from '../utils/handleData';
 import util from '../utils/util';
 import getMapSourceName from '../utils/getMapSourceName';
+
+const cache = [];
 
 export default {
   name: 'Map',
@@ -23,34 +26,40 @@ export default {
     };
   },
   computed: {
+    ...mapState(['geoData']),
     chartInstance() {
       return this.$echarts.init(document.getElementById('map'));
     },
+  },
+  watch: {
+    // geoData(newData) {
+    //   console.log(newData);
+    // },
   },
   methods: {
     resize() {
       this.style = `height: ${window.innerHeight - 40}px`;
       this.chartInstance.resize();
     },
-    initChart() {
+    async initChart() {
       const { userData, countList } = handleData(rawData);
 
-      this.chartInstance.showLoading();
-      util.get('assets/world.json').then((geoData) => {
+      if (!cache['assets/world.json']) {
+        this.chartInstance.showLoading();
+        cache['assets/world.json'] = await util.get('assets/world.json');
         this.chartInstance.hideLoading();
-
-        this.names.push(this.mapName);
-        this.layerInstance.fillAreaLayer = new FillAreaLayer(
-          this.chartInstance,
-          this.areaName,
-          this.names,
-          geoData,
-          countList,
-          userData,
-        );
-      });
+      }
+      this.names.push(this.mapName);
+      this.layerInstance.fillAreaLayer = new FillAreaLayer(
+        this.chartInstance,
+        this.areaName,
+        this.names,
+        cache['assets/world.json'],
+        countList,
+        userData,
+      );
     },
-    updateChart(args) {
+    async updateChart(args) {
       // 世界地图，特殊处理
       if (args[0].name.toLowerCase() === 'world') {
         this.names = this.names.slice(0, 1);
@@ -74,13 +83,15 @@ export default {
       }
       const path = `assets/${this.names.join('/')}.json`;
 
-      this.chartInstance.showLoading();
-      util.get(path).then((geoData) => {
+      // 缓存，优化性能
+      if (!cache[path]) {
+        this.chartInstance.showLoading();
+        cache[path] = await util.get(path);
         this.chartInstance.hideLoading();
-        this.layerInstance.fillAreaLayer.updateMap(
-          this.chartInstance, this.areaName, this.names, geoData,
-        );
-      });
+      }
+      this.layerInstance.fillAreaLayer.updateMap(
+        this.chartInstance, this.areaName, this.names, cache[path],
+      );
     },
   },
   mounted() {
