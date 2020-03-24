@@ -33,12 +33,18 @@ class FillAreaLayer {
         left: 65,
         top: '40px',
         style: {
-          fill: '#aaa',
+          fill: '#3eaf7c',
           text: this.areaName,
           font: '12px Microsoft YaHei',
         },
         // onclick: function () { // eslint-disable-line object-shorthand
         //   console.log('click graphic: ', this.style);
+        // },
+        // onmouseover: function () { // eslint-disable-line object-shorthand
+        //   this.style.textFill = '#3ecf7c';
+        // },
+        // onmouseout: function () { // eslint-disable-line object-shorthand
+        //   this.style.textFill = '#3eaf7c';
         // },
       },
     ];
@@ -197,17 +203,32 @@ class FillAreaLayer {
     if (this.names.length > this.option.graphic.length) {
       this.option.graphic.push(
         {
-          id: this.mapName,
-          name: this.areaName,
-          type: 'text',
-          z: 100,
-          left: this.option.graphic[this.option.graphic.length - 1].left + 40,
+          type: 'group',
+          left: this.option.graphic[this.option.graphic.length - 1].left + 60,
           top: '40px',
-          style: {
-            fill: '#aaa',
-            text: areaName,
-            font: '12px Microsoft YaHei',
-          },
+          children: [
+            {
+              type: 'text',
+              style: {
+                fill: '#ccc',
+                text: '>',
+                font: '12px Microsoft YaHei',
+              },
+            },
+            {
+              type: 'text',
+              id: this.mapName,
+              name: this.areaName,
+              info: '',
+              left: 15,
+              z: 100,
+              style: {
+                fill: '#3eaf7c',
+                text: areaName,
+                font: '12px Microsoft YaHei',
+              },
+            },
+          ],
         },
       );
     } else {
