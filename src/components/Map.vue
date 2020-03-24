@@ -1,6 +1,6 @@
 <template>
     <div>
-      <div class='chartsWrapper' id='map'></div>
+      <div class='chartsWrapper' :style='style' id='map'></div>
     </div>
 </template>
 
@@ -19,6 +19,7 @@ export default {
       areaName: 'World',
       mapName: 'world',
       names: [],
+      style: '',
     };
   },
   computed: {
@@ -27,6 +28,10 @@ export default {
     },
   },
   methods: {
+    resize() {
+      this.style = `height: ${window.innerHeight - 40}px`;
+      this.chartInstance.resize();
+    },
     initChart() {
       const { userData, countList } = handleData(rawData);
 
@@ -85,6 +90,10 @@ export default {
         this.updateChart(args);
       }
     });
+    window.addEventListener('resize', this.resize);
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.resize);
   },
 };
 </script>
