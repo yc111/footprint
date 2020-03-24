@@ -40,6 +40,8 @@
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.0",
     "terser-webpack-plugin": "^2.1.0",
+    "vue-loader": "^15.9.1",
+    "vue-template-compiler": "^2.6.11",
     "webpack": "^4.40.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.1",
@@ -48,6 +50,7 @@
   "dependencies": {
     "@babel/runtime": "^7.6.0",
     "core-js": "^2.6.9",
-    "echarts": "^4.3.0"
+    "echarts": "^4.3.0",
+    "vue": "^2.6.11"
   }
 }

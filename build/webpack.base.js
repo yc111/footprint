@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const devConfig = require('./webpack.dev');
 const prodConfig = require('./webpack.prod');
@@ -17,6 +18,10 @@ module.exports = (env) => {
     },
     module: {
       rules: [
+        {
+          test: /\.vue$/,
+          use: 'vue-loader',
+        },
         {
           test: /\.js$/,
           use: ['babel-loader'],
@@ -55,6 +60,7 @@ module.exports = (env) => {
       !isDev && new MiniCssExtractPlugin({
         filename: 'style.css',
       }),
+      new VueLoaderPlugin(),
       new CopyWebpackPlugin([
         { from: './src/assets', to: 'assets' },
       ]),

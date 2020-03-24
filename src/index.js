@@ -1,4 +1,7 @@
-import './theme/index.scss';
-import App from './components/App';
+import Vue from 'vue';
+import App from './App.vue';
+import './plugins/echarts';
 
-App();
+new Vue({
+  render: (h) => h(App),
+}).$mount('#root');
