@@ -1,5 +1,4 @@
 import * as echarts from 'echarts/lib/echarts';
-import worldGeo from '../../assets/world.json';
 
 class FillAreaLayer {
   constructor(chart, areaName, names, geoData, pieData, mapData) {
@@ -154,7 +153,7 @@ class FillAreaLayer {
       // },
     };
 
-    echarts.registerMap(this.mapName, worldGeo);
+    echarts.registerMap(this.mapName, this.geoData);
     this.render(this.chart, this.option);
 
     this.chart.on('legendselectchanged', (params) => {
