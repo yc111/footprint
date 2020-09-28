@@ -18,3 +18,7 @@
 3. 修改 `src/config/place.config.js` 文件，定制你的足迹
 4. 执行 `npm start` 预览效果
 5. 执行 `npm run build`，即可在 `dist` 目录获取打包文件
+
+
+主界面预览：
+![footprint-view](./src/images/footprint-view.jpg)

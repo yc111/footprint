@@ -15,6 +15,8 @@ const data = [
   { name: '株洲市', map: 'zhuzhou' },
   { name: '定西市', map: 'dingxi' },
   { name: '天水市', map: 'tianshui' },
+  { name: '三亚市', map: 'sanya' },
+  { name: '海口市', map: 'haikou' },
 ];
 
 export default data;
