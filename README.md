@@ -1,3 +1,5 @@
+
+
 <h1 align="center"> FootPrint </h1>
 
 <p align="center">
@@ -16,7 +18,7 @@
 1. `fork` 本项目后再 `clone` 到本地
 2. 进入项目目录执行 `npm i` 安装依赖
 3. 修改 `src/config/place.config.js` 文件，定制你的足迹
-4. 执行 `npm start` 预览效果
+4. 执行 `npm start` 启动本地开发服务并自动打开浏览器预览效果
 5. 执行 `npm run build`，即可在 `dist` 目录获取打包文件
 
 
