@@ -7,7 +7,7 @@ const data = [ // 0: 没去过 1: 去过1次 2: 去过几次 3: 经常去
   { name: '澳门', degree: 1 },
   { name: '北京', degree: 2 },
   { name: '重庆', degree: 1 },
-  { name: '福建', degree: 0 },
+  { name: '福建', degree: 1 },
   { name: '甘肃', degree: 2 },
   { name: '广东', degree: 3 },
   { name: '广西', degree: 1 },
